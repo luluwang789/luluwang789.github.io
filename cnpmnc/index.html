@@ -116,6 +116,12 @@
                 color: white
             }
 
+            textarea{
+                border-radius: 5px;
+                border: none;
+                font-family: 'Be Vietnam', sans-serif;
+            }
+
             /* button scroll to the top */
             #myBtn {
                 display: none; /* Hidden by default */
@@ -150,7 +156,8 @@
         <!-- content -->
         <section id="sec1">
             <div class="subject">
-                <h3>Công nghệ phần mền nâng cao</h3>
+                <h3>Công nghệ phần mền nâng cao <br> <p style="font-size: 20px;">Hoạt động 2: Giải pháp nhận dạng văn bản</p></h3>
+                
                 <div class="title">
                     <h5>Thành viên nhóm 7</h5>
                 </div>
@@ -187,14 +194,14 @@
                                 <input type="file" class="form-control" id="input_image1" name="input_image" onchange="readURL(this, 1);" />
                             </div>
     
+                            <label for="input_image"><strong>Cơ quan ban hành:</strong></label>
                             <div id="input3">
-                                <label for="input_image"><strong>Cơ quan ban hành:</strong></label>
-                                <input type="text" class="form-control" id="cqbh"/>
+                                <textarea type="text" class="form-control" id="cqbh" rows="10" cols="50"></textarea>
                             </div>
                         </div>
                         <br>
                         <div id="text-output">
-                            <textarea id="image-text" rows="25" cols="50"></textarea>
+                            <textarea id="image-text" rows="10" cols="50"></textarea>
                         </div>
     
                         <div class="load">
