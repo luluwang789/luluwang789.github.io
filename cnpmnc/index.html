@@ -6,6 +6,9 @@
 		<meta name="keywords" content="Tesseract,OCR,JavaScript">
 		<meta name="author" content="Đức Trần">
         <script src="https://kit.fontawesome.com/2b89520767.js" crossorigin="anonymous"></script>
+        <!-- jcrop -->
+        <link rel="stylesheet" href="https://unpkg.com/jcrop/dist/jcrop.css">
+        
         <style>
             @import url("https://fonts.googleapis.com/css2?family=Be+Vietnam:wght@300;400;500;700&display=swap");
             html{
@@ -179,7 +182,7 @@
                 <div class="content-active2">
                     <div class="canvas-img">
                         <canvas id="canvas01" style="display:none"></canvas>
-                        <img id="image01" src="cv1.jpg" alt="Girl in a jacket" width="400" height="500"/>
+                        <div id="crop-img"></div>
                     </div>
     
                     <div class="content-convert">
@@ -188,20 +191,10 @@
                                 <label for="input_image"><strong>Chọn tệp ảnh văn bản:</strong></label>
                                 <input type="file" class="form-control" id="input_image" name="input_image" onchange="readURL(this);" />
                             </div>
-                
-                            <div id="input2">
-                                <label for="input_image"><strong>Chọn phần 1 phần văn bản:</strong></label>
-                                <input type="file" class="form-control" id="input_image1" name="input_image" onchange="readURL(this, 1);" />
-                            </div>
-    
-                            <label for="input_image"><strong>Cơ quan ban hành:</strong></label>
-                            <div id="input3">
-                                <textarea type="text" class="form-control" id="cqbh" rows="10" cols="50"></textarea>
-                            </div>
                         </div>
                         <br>
                         <div id="text-output">
-                            <textarea id="image-text" rows="10" cols="50"></textarea>
+                            <textarea id="image-text" rows="20" cols="50"></textarea>
                         </div>
     
                         <div class="load">
@@ -209,14 +202,19 @@
                         </div>
     
                         <div id="btn-conver">
-                            <button type="button" class="btn" id="setupCrop" onclick="step2();">Crop</button>
-                            <button type="button" class="btn" id="ttt" onclick="textExtract();">Trích thông tin</button>
+                            <button type="button" class="btn" id="setupCrop" onclick="changeText();">convert</button>
                         </div>
                     </div>
                 </div>
                 
             </div>
         </section>
+
+        <div style="display: none">
+            <canvas id="canvas"></canvas>
+            <input id="png" type="hidden" />
+        </div>
+
         <!-- // content -->
 
         <button onclick="topFunction()" id="myBtn" title="Đi tới đầu"><i class="fa fa-chevron-up" aria-hidden="true"></i></button>
@@ -224,6 +222,11 @@
 	<script src='https://cdn.rawgit.com/naptha/tesseract.js/1.0.10/dist/tesseract.js'></script>
     <script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
     <script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"></script>
+    
+    <!-- <script src="https://unpkg.com/jcrop"></script> -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-jcrop/0.9.15/js/jquery.Jcrop.min.js"></script>
+    <script src="https://unpkg.com/buffer@6.0.3/index.js"></script>
     
     <!-- scroll to the top -->
     <script type="text/javascript">
@@ -250,147 +253,73 @@
     <!-- \\scroll to the top -->
 
     <script>
-        var typeExtraction = 0;
-        document.addEventListener('DOMContentLoaded', function(){
-            var input_image = document.getElementById('input_image');
-            input_image.addEventListener('change', handleInputChange);
-            var input_image1 = document.getElementById('input_image1');
-            input_image1.addEventListener('change', handleInputChange);
-            var input_image2 = document.getElementById('input_image2');
-            input_image2.addEventListener('change', handleInputChange);
-            var input_image3 = document.getElementById('input_image3');
-            input_image3.addEventListener('change', handleInputChange);
-            var input_image4 = document.getElementById('input_image4');
-            input_image4.addEventListener('change', handleInputChange);
-            var input_image5 = document.getElementById('input_image5');
-            input_image5.addEventListener('change', handleInputChange);
-            var input_image6 = document.getElementById('input_image6');
-            input_image6.addEventListener('change', handleInputChange);
-            var input_image7 = document.getElementById('input_image7');
-            input_image7.addEventListener('change', handleInputChange);
-            //document.getElementById('image01').src = input_image;
-        });
+    // load img to img#image01
+    var crop_max_width = 400;
+    var crop_max_height = 500;
 
-        function handleInputChange(event){
-            var input = event.target;
-            var file = input.files[0];
-            console.log(file);
-            Tesseract.recognize(file,'vie')
-                .progress(function(message){
-                    document.getElementById('progressbar').value = message.progress;
-                    console.log(message);
-                })
-                .then(function(result){
-                    
-                    var contentArea = document.getElementById('image-text');
-                    if(typeExtraction == 1)
-                        document.getElementById('cqbh').value = result.text;
-                    else if(typeExtraction == 2)
-                        document.getElementById('skh').value = result.text;
-                    else if(typeExtraction == 3)
-                        document.getElementById('ntn').value = result.text;
-                    else if(typeExtraction == 4)
-                        document.getElementById('tlvb').value = result.text;
-                    else if(typeExtraction == 5)
-                        document.getElementById('ty').value = result.text;
-                    else if(typeExtraction == 6)
-                        document.getElementById('nn').value = result.text;
-                    else if(typeExtraction == 7)
-                        document.getElementById('nk').value = result.text;
-                    else
-                        contentArea.innerHTML += "br>" + result.text;
-                    console.log(result);
-                })
-                .catch(function(err){
-                    console.error(err);
-                });
-        }
-
-        function readURL(input, part = 0) {
-            typeExtraction = part;
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-
-                reader.onload = function (e) {
-                    $('#image01')
-                        .attr('src', e.target.result)
-                        .width(500)
-                        .height(600);
-                };
-
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function textExtract(image) {
-            var canvas = document.querySelector('#canvas01');
-            var img = document.querySelector('#image01');
-            //var cropData = $(img).data().Jcrop.tellSelect();
-            //console.log(cropData);
-            var ctx = canvas.getContext('2d');
-            ctx.drawImage(
-                image,
-                0,
-                0,
-                1200,
-                560);
-                
-            Tesseract.recognize(ctx,'vie')
-                .then(function(result){
-                    var contentArea = document.getElementById('cqbh');
-                    contentArea.innerHTML = result.text;
-                    console.log(result);
-                })
-                .catch(function(err){
-                    console.error(err);
-                });
+    function readURL(input, part = 0) {
+        typeExtraction = part;
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $("#crop-img").html("")
+                .append('<img src="' + e.target.result + '" alt="" id="image" width="400" height="500"/>');                
             
+                $("#crop-img  img").Jcrop({
+                    onChange: canvas,
+                    onSelect: canvas,
+                    boxWidth: crop_max_width,
+                    boxHeight: crop_max_height,
+                });
+            };
+            reader.readAsDataURL(input.files[0]);
         }
-        function step2() {
-            var canvas = document.querySelector('#canvas01');
-            var img = document.querySelector('#image01');
-            
-            if(reader != null)
-                img = 
+    }
 
-            //setup canvas
-            canvas.width = pictureWidth;
-            canvas.height = pictureHeight;
+    function canvas(coords) {
+        var imageObj = $("#crop-img img")[0];
+        var canvas = $("#canvas")[0];
+        canvas.width = coords.w;
+        canvas.height = coords.h;
+        var context = canvas.getContext("2d");
+        context.drawImage(
+            imageObj,
+            coords.x,
+            coords.y,
+            coords.w,
+            coords.h,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+        png();
+    }
 
-            var ctx = canvas.getContext('2d');
+    function png() {
+        var png = $("#canvas")[0].toDataURL("image/png");
+        $("#png").val(png);
+    }
 
-            //draw picture from video on canvas
-            ctx.drawImage(video, 0, 0);
-
-            //modify the picture using glfx.js filters
-            texture = fxCanvas.texture(canvas);
-            fxCanvas.draw(texture)
-                .hueSaturation(-1, -1)//grayscale
-                .unsharpMask(20, 2)
-                .brightnessContrast(0.2, 0.9)
-                .update();
-
-            window.texture = texture;
-            window.fxCanvas = fxCanvas;
-
-            $(img)
-                //setup the crop utility
-                .one('load', function () {
-                    if (!$(img).data().Jcrop) {
-                        $(img).Jcrop({
-                            onSelect: function () {
-                                //Enable the 'done' button
-                                $('#adjust').removeAttr('disabled');
-                            }
-                        });
-                    } else {
-                        //update crop tool (it creates copies of <img> that we have to update manually)
-                        $('.jcrop-holder img').attr('src', fxCanvas.toDataURL());
-                    }
-                })
-                //show output from glfx.js
-                .attr('src', fxCanvas.toDataURL());
-        }
+    // convert image to text
+    function changeText() {
+        let image = $("#png").val();
+        if (image === "") image = $("#crop-img img").attr("src");
+        Tesseract.recognize(image, { lang: "vie" })
+            .progress(function (message) {
+                document.getElementById("progressbar").value = message.progress;
+                console.log(message);
+            })
+            .then(function (result) {
+                var contentArea = document.getElementById("image-text");
+                contentArea.innerHTML = result.text;
+                console.log(result);
+                $("#png").val("");
+            })
+            .catch(function (err) {
+            console.error(err);
+            });
+    }
     </script>
 
 </html>
