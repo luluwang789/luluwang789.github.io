@@ -1,0 +1,393 @@
+ <html>
+    <head>
+        <title>Giải pháp nhận dạng văn bản</title>
+		<meta charset="UTF-8">
+		<meta name="description" content="Giải pháp nhận dạng văn bản">
+		<meta name="keywords" content="Tesseract,OCR,JavaScript">
+		<meta name="author" content="Phúc Nguyễn">
+        <script src="https://kit.fontawesome.com/2b89520767.js" crossorigin="anonymous"></script>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Be+Vietnam:wght@300;400;500;700&display=swap");
+            *{
+                margin: 0;
+                padding: 0;
+            }
+
+            body{
+                background-color: #ffc955;
+                font-family: "Be Vietnam", sans-serif;
+                color: rgb(90, 90, 90);
+            }
+
+            .form-control{
+
+            }
+
+            /* Navbar */
+            .navbar{
+                position: fixed;
+                width: 100%;
+                top: 0;
+                left: 0;
+                padding: 15px 35px;
+                text-align: center;
+                background-color: rgb(90, 90, 90);
+                z-index: 999;
+            }
+
+            .navbar a{
+                text-decoration: none;
+                padding-right: 30px;
+                color: #fff;
+                font-size: 25px;
+                text-transform: uppercase;
+                font-weight: 700;
+            }
+            .navbar a:hover{
+                color: orange;
+            }
+            /* \\Navbar */
+
+            #page1{
+                padding-top: 200px;
+                height: 100vh;
+                text-align: center;
+                font-size: 30px;
+            }
+
+            #page1 .group-name h4{
+                font-size: 40px;
+                text-transform: uppercase;
+            }
+
+            #page1 .subject h2{
+                font-size: 45px;
+                text-transform: uppercase;
+            }
+
+            #page2{
+                text-align: center;
+                padding-top: 55px;
+            }
+
+            #page2  .title h3{
+                font-size: 45px;
+            }
+
+            .input-convert div{
+                display: inline-block;
+            }
+
+            .convert div{
+                display: inline-block;
+            }
+
+            #btn-conver button{
+                border: none;
+                border-radius: 10px;
+                background-color: rgb(87, 87, 87);
+                color: white;
+                padding: 10px 20px;
+                font-size: 20px;
+                margin: 15px 25px;
+            }
+
+            #btn-conver button:hover{
+                background-color: rgb(226, 139, 139);
+                color: white;
+            }
+
+            /* button scroll to the top */
+            #myBtn {
+                display: none; /* Hidden by default */
+                position: fixed; /* Fixed/sticky position */
+                bottom: 20px; /* Place the button at the bottom of the page */
+                right: 30px; /* Place the button 30px from the right */
+                z-index: 99; /* Make sure it does not overlap */
+                border: none; /* Remove borders */
+                outline: none; /* Remove outline */
+                background-color: rgb(90, 90, 90); /* Set a background color */
+                color: white; /* Text color */
+                cursor: pointer; /* Add a mouse pointer on hover */
+                padding: 15px; /* Some padding */
+                border-radius: 10px; /* Rounded corners */
+                font-size: 18px; /* Increase font size */
+            }
+
+            #myBtn:hover {
+                background-color: rgb(226, 139, 139); /* Add a dark-grey background on hover */
+            }
+            /* \\ button scroll to the top */
+        </style>
+
+    </head>
+    <body> 
+        <div class="navbar">
+            <a href="#page1">Giới thiệu</a>
+            <a href="#page2">Hoạt động 2</a>
+        </div>
+
+        <div id="page1">
+            <div class="subject">
+                <h2>Công nghệ phần mềm nâng cao</h2>
+            </div>
+
+            <div class="group-name">
+                <h4>Nhóm 7</h4>
+            </div>
+
+            <div class="nember">
+                <p>Trần Hoài Đức - 44.01.104.076</p>
+                <p>Nguyễn Thành Duy - 44.01.104.</p>
+                <p>Nguyễn Thị Uyển Cương - 44.01.104.</p>
+                <p>Nguyễn Dương Hồng Diệu - 44.01.104.</p>
+            </div>
+        </div>
+    
+        <div id="page2">
+            <div class="title">
+                <h3>Hoạt động 2</h3> 
+            </div>
+            <br>
+            <div class="input-convert">
+                <div id="input1">
+                    <label for="input_image"><strong>Chọn tệp ảnh văn bản:</strong></label>
+                    <input type="file" class="form-control" id="input_image" name="input_image" onchange="readURL(this);" />
+                </div>
+    
+                <div id="input1">
+                    <label for="input_image"><strong>Chọn phần 1 phần văn bản:</strong></label>
+                    <input type="file" class="form-control" id="input_image1" name="input_image" onchange="readURL(this, 1);" />
+                </div>
+            </div>
+
+            <div id="input3">
+                <label for="input_image"><strong>Cơ quan ban hành:</strong></label>
+                <input type="text" class="form-control" id="cqbh"/>
+            </div>
+            <br>
+            <div class="convert">
+                <div id="canvas-img">
+                    <canvas id="canvas01" style="display:none"></canvas>
+                    <img id="image01" src="cv1.jpg" alt="Girl in a jacket" width="500" height="500"/>
+                </div>
+                
+                <div id="text-output">
+                    <textarea id="image-text" rows="33" cols="55"></textarea>
+                </div>
+            </div>
+
+            <div class="load">
+                <progress id="progressbar" min="0" max="1" value="0"/>
+            </div>
+
+            <div id="btn-conver">
+                <button type="button" class="btn btn-primary" id="setupCrop" onclick="step2();">Crop</button>
+                <button type="button" class="btn btn-primary" id="ttt" onclick="textExtract();">Trích thông tin</button>
+            </div>
+        </div>
+
+        <!-- <img id="image01" src="cv1.jpg" alt="cv1.jpg"> </img> -->		
+        <button onclick="topFunction()" id="myBtn" title="Đi tới đầu"><i class="fa fa-chevron-up" aria-hidden="true"></i></button>
+    </body>
+	<script src='https://cdn.rawgit.com/naptha/tesseract.js/1.0.10/dist/tesseract.js'></script>
+    <script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"></script>
+    
+    <!-- scroll to the top -->
+    <script>
+        //Get the button:
+        mybutton = document.getElementById("myBtn");
+
+        // When the user scrolls down 20px from the top of the document, show the button
+        window.onscroll = function() {scrollFunction()};
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                mybutton.style.display = "block";
+            } else {
+                mybutton.style.display = "none";
+            }
+        }
+
+        // When the user clicks on the button, scroll to the top of the document
+        function topFunction() {
+            $([document.documentElement, document.body]).animate({
+                scrollTop: 0
+            }, 500);
+        }
+    </script>
+    <!-- \\scroll to the top -->
+
+    <script>
+        $(document).ready(function(){
+            // Add smooth scrolling to all links
+            $("a").on('click', function(event) {
+
+                // Make sure this.hash has a value before overriding default behavior
+                if (this.hash !== "") {
+                // Prevent default anchor click behavior
+                event.preventDefault();
+
+                // Store hash
+                var hash = this.hash;
+
+                // Using jQuery's animate() method to add smooth page scroll
+                // The optional number (800) specifies the number of milliseconds it takes to scroll to the specified area
+                $('html, body').animate({
+                    scrollTop: $(hash).offset().top
+                }, 800, function(){
+
+                    // Add hash (#) to URL when done scrolling (default click behavior)
+                    window.location.hash = hash;
+                });
+                } // End if
+            });
+        });
+    </script>
+
+    <script>
+        var typeExtraction = 0;
+        document.addEventListener('DOMContentLoaded', function(){
+            var input_image = document.getElementById('input_image');
+            input_image.addEventListener('change', handleInputChange);
+            var input_image1 = document.getElementById('input_image1');
+            input_image1.addEventListener('change', handleInputChange);
+            var input_image2 = document.getElementById('input_image2');
+            input_image2.addEventListener('change', handleInputChange);
+            var input_image3 = document.getElementById('input_image3');
+            input_image3.addEventListener('change', handleInputChange);
+            var input_image4 = document.getElementById('input_image4');
+            input_image4.addEventListener('change', handleInputChange);
+            var input_image5 = document.getElementById('input_image5');
+            input_image5.addEventListener('change', handleInputChange);
+            var input_image6 = document.getElementById('input_image6');
+            input_image6.addEventListener('change', handleInputChange);
+            var input_image7 = document.getElementById('input_image7');
+            input_image7.addEventListener('change', handleInputChange);
+            //document.getElementById('image01').src = input_image;
+        });
+
+        function handleInputChange(event){
+            var input = event.target;
+            var file = input.files[0];
+            console.log(file);
+            Tesseract.recognize(file,'vie')
+                .progress(function(message){
+                    document.getElementById('progressbar').value = message.progress;
+                    console.log(message);
+                })
+                .then(function(result){
+                    
+                    var contentArea = document.getElementById('image-text');
+                    if(typeExtraction == 1)
+                        document.getElementById('cqbh').value = result.text;
+                    else if(typeExtraction == 2)
+                        document.getElementById('skh').value = result.text;
+                    else if(typeExtraction == 3)
+                        document.getElementById('ntn').value = result.text;
+                    else if(typeExtraction == 4)
+                        document.getElementById('tlvb').value = result.text;
+                    else if(typeExtraction == 5)
+                        document.getElementById('ty').value = result.text;
+                    else if(typeExtraction == 6)
+                        document.getElementById('nn').value = result.text;
+                    else if(typeExtraction == 7)
+                        document.getElementById('nk').value = result.text;
+                    else
+                        contentArea.innerHTML += "br>" + result.text;
+                    console.log(result);
+                })
+                .catch(function(err){
+                    console.error(err);
+                });
+        }
+
+        function readURL(input, part = 0) {
+            typeExtraction = part;
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#image01')
+                        .attr('src', e.target.result)
+                        .width(500)
+                        .height(600);
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function textExtract(image) {
+            var canvas = document.querySelector('#canvas01');
+            var img = document.querySelector('#image01');
+            //var cropData = $(img).data().Jcrop.tellSelect();
+            //console.log(cropData);
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(
+                image,
+                0,
+                0,
+                1200,
+                560);
+                
+            Tesseract.recognize(ctx,'vie')
+                .then(function(result){
+                    var contentArea = document.getElementById('cqbh');
+                    contentArea.innerHTML = result.text;
+                    console.log(result);
+                })
+                .catch(function(err){
+                    console.error(err);
+                });
+            
+        }
+        function step2() {
+            var canvas = document.querySelector('#canvas01');
+            var img = document.querySelector('#image01');
+            
+            if(reader != null)
+                img = 
+
+            //setup canvas
+            canvas.width = pictureWidth;
+            canvas.height = pictureHeight;
+
+            var ctx = canvas.getContext('2d');
+
+            //draw picture from video on canvas
+            ctx.drawImage(video, 0, 0);
+
+            //modify the picture using glfx.js filters
+            texture = fxCanvas.texture(canvas);
+            fxCanvas.draw(texture)
+                .hueSaturation(-1, -1)//grayscale
+                .unsharpMask(20, 2)
+                .brightnessContrast(0.2, 0.9)
+                .update();
+
+            window.texture = texture;
+            window.fxCanvas = fxCanvas;
+
+            $(img)
+                //setup the crop utility
+                .one('load', function () {
+                    if (!$(img).data().Jcrop) {
+                        $(img).Jcrop({
+                            onSelect: function () {
+                                //Enable the 'done' button
+                                $('#adjust').removeAttr('disabled');
+                            }
+                        });
+                    } else {
+                        //update crop tool (it creates copies of <img> that we have to update manually)
+                        $('.jcrop-holder img').attr('src', fxCanvas.toDataURL());
+                    }
+                })
+                //show output from glfx.js
+                .attr('src', fxCanvas.toDataURL());
+        }
+    </script>
+
+</html>
