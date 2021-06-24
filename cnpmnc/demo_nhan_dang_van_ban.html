@@ -4,97 +4,116 @@
 		<meta charset="UTF-8">
 		<meta name="description" content="Giải pháp nhận dạng văn bản">
 		<meta name="keywords" content="Tesseract,OCR,JavaScript">
-		<meta name="author" content="Phúc Nguyễn">
+		<meta name="author" content="Đức Trần">
         <script src="https://kit.fontawesome.com/2b89520767.js" crossorigin="anonymous"></script>
         <style>
             @import url("https://fonts.googleapis.com/css2?family=Be+Vietnam:wght@300;400;500;700&display=swap");
-            *{
-                margin: 0;
-                padding: 0;
+            html{
+                scroll-behavior: smooth;
             }
 
             body{
-                background-color: #ffc955;
-                font-family: "Be Vietnam", sans-serif;
-                color: rgb(90, 90, 90);
+                margin: 0;
+                padding: 0;
+                font-family: 'Be Vietnam', sans-serif;
             }
 
-            .form-control{
-
+            section{
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
 
-            /* Navbar */
-            .navbar{
-                position: fixed;
+            section:nth-child(odd){
+                background-color: rgb(252, 200, 104);
+            }
+
+            ul{
                 width: 100%;
-                top: 0;
-                left: 0;
-                padding: 15px 35px;
-                text-align: center;
                 background-color: rgb(90, 90, 90);
-                z-index: 999;
+                height: 50px;
+                margin: 0;
+                padding: 0;
+                position: fixed;
+                top: 0;
+                letter-spacing: 0;
+                display: flex;
+                justify-content: space-around;
             }
 
-            .navbar a{
-                text-decoration: none;
-                padding-right: 30px;
+            ul li{
+                list-style: none;
+            }
+
+            ul li a{
                 color: #fff;
+                line-height: 50px;
+                box-sizing: border-box;
+                font-weight: bold;
+                text-transform: uppercase;
+                text-decoration: none;
+            }
+
+            ul li a:hover{
+                color: orange;
+            }
+            /* page 1 */
+            #sec1 .subject h3{
+                text-align: center;
+                font-size: 45px;
+                font-weight: bold;
+                text-transform: uppercase;
+                color: rgb(51, 51, 51);
+            }
+
+            #sec1 .subject .title h5{
+                text-align: center;
                 font-size: 25px;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+
+            #sec1 .subject .member{
+                text-align: center;
+                font-size: 18px;
+                font-weight: 500;
+                text-transform: uppercase;
+            }
+
+            /* page 2 */
+            div.title h3{
+                text-align: center;
+                font-size: 35px;
                 text-transform: uppercase;
                 font-weight: 700;
             }
-            .navbar a:hover{
-                color: orange;
-            }
-            /* \\Navbar */
 
-            #page1{
-                padding-top: 200px;
-                height: 100vh;
-                text-align: center;
-                font-size: 30px;
+            div.active2 .content-active2{
+                display: flex;
             }
 
-            #page1 .group-name h4{
-                font-size: 40px;
-                text-transform: uppercase;
+            div.active2 .content-active2 .canvas-img{
+                padding-right: 20px;
             }
 
-            #page1 .subject h2{
-                font-size: 45px;
-                text-transform: uppercase;
+            div.active2 .content-active2 .content-convert{
+                padding-left: 20px;
             }
 
-            #page2{
-                text-align: center;
-                padding-top: 55px;
-            }
-
-            #page2  .title h3{
-                font-size: 45px;
-            }
-
-            .input-convert div{
-                display: inline-block;
-            }
-
-            .convert div{
-                display: inline-block;
-            }
-
-            #btn-conver button{
+            button.btn{
                 border: none;
-                border-radius: 10px;
-                background-color: rgb(87, 87, 87);
                 color: white;
+                background-color: tomato;
                 padding: 10px 20px;
-                font-size: 20px;
-                margin: 15px 25px;
+                border-radius: 5px;
+                text-transform: uppercase;
+                font-weight: bold;
             }
 
-            #btn-conver button:hover{
-                background-color: rgb(226, 139, 139);
-                color: white;
+            button.btn:hover{
+                background-color: violet;
+                color: white
             }
 
             /* button scroll to the top */
@@ -122,72 +141,76 @@
 
     </head>
     <body> 
-        <div class="navbar">
-            <a href="#page1">Giới thiệu</a>
-            <a href="#page2">Hoạt động 2</a>
-        </div>
-
-        <div id="page1">
+        <ul>
+            <li><a href="#sec1">Giới thiệu</a></li>
+            <li><a href="#sec2">Hoạt động 2</a></li>
+        </ul>
+        
+        <!-- content -->
+        <section id="sec1">
             <div class="subject">
-                <h2>Công nghệ phần mềm nâng cao</h2>
-            </div>
-
-            <div class="group-name">
-                <h4>Nhóm 7</h4>
-            </div>
-
-            <div class="nember">
-                <p>Trần Hoài Đức - 44.01.104.076</p>
-                <p>Nguyễn Thành Duy - 44.01.104.</p>
-                <p>Nguyễn Thị Uyển Cương - 44.01.104.</p>
-                <p>Nguyễn Dương Hồng Diệu - 44.01.104.</p>
-            </div>
-        </div>
-    
-        <div id="page2">
-            <div class="title">
-                <h3>Hoạt động 2</h3> 
-            </div>
-            <br>
-            <div class="input-convert">
-                <div id="input1">
-                    <label for="input_image"><strong>Chọn tệp ảnh văn bản:</strong></label>
-                    <input type="file" class="form-control" id="input_image" name="input_image" onchange="readURL(this);" />
+                <h3>Công nghệ phần mền nâng cao</h3>
+                <div class="title">
+                    <h5>Thành viên</h5>
                 </div>
-    
-                <div id="input1">
-                    <label for="input_image"><strong>Chọn phần 1 phần văn bản:</strong></label>
-                    <input type="file" class="form-control" id="input_image1" name="input_image" onchange="readURL(this, 1);" />
+                <div class="member">
+                    <p>Trần Hoài Đức - 4401104076</p>
+                    <p>Nguyễn Thành Duy - 4401104070</p>
+                    <p>Nguyễn Thị Uyển Cương - 4401104058</p>
+                    <p>Nguyễn Dương Hồng Diệu - 4401104004</p>
                 </div>
             </div>
+        </section>
 
-            <div id="input3">
-                <label for="input_image"><strong>Cơ quan ban hành:</strong></label>
-                <input type="text" class="form-control" id="cqbh"/>
-            </div>
-            <br>
-            <div class="convert">
-                <div id="canvas-img">
-                    <canvas id="canvas01" style="display:none"></canvas>
-                    <img id="image01" src="cv1.jpg" alt="Girl in a jacket" width="500" height="500"/>
+        <section id="sec2">
+            <div class="active2"> 
+                <div class="title">
+                    <h3>Hoạt động 2</h3>
+                </div>
+
+                <div class="content-active2">
+                    <div class="canvas-img">
+                        <canvas id="canvas01" style="display:none"></canvas>
+                        <img id="image01" src="cv1.jpg" alt="Girl in a jacket" width="400" height="500"/>
+                    </div>
+    
+                    <div class="content-convert">
+                        <div class="input-content">
+                            <div id="input1">
+                                <label for="input_image"><strong>Chọn tệp ảnh văn bản:</strong></label>
+                                <input type="file" class="form-control" id="input_image" name="input_image" onchange="readURL(this);" />
+                            </div>
+                
+                            <div id="input2">
+                                <label for="input_image"><strong>Chọn phần 1 phần văn bản:</strong></label>
+                                <input type="file" class="form-control" id="input_image1" name="input_image" onchange="readURL(this, 1);" />
+                            </div>
+    
+                            <div id="input3">
+                                <label for="input_image"><strong>Cơ quan ban hành:</strong></label>
+                                <input type="text" class="form-control" id="cqbh"/>
+                            </div>
+                        </div>
+                        <br>
+                        <div id="text-output">
+                            <textarea id="image-text" rows="25" cols="50"></textarea>
+                        </div>
+    
+                        <div class="load">
+                            <progress id="progressbar" min="0" max="1" value="0"/>
+                        </div>
+    
+                        <div id="btn-conver">
+                            <button type="button" class="btn" id="setupCrop" onclick="step2();">Crop</button>
+                            <button type="button" class="btn" id="ttt" onclick="textExtract();">Trích thông tin</button>
+                        </div>
+                    </div>
                 </div>
                 
-                <div id="text-output">
-                    <textarea id="image-text" rows="33" cols="55"></textarea>
-                </div>
             </div>
+        </section>
+        <!-- // content -->
 
-            <div class="load">
-                <progress id="progressbar" min="0" max="1" value="0"/>
-            </div>
-
-            <div id="btn-conver">
-                <button type="button" class="btn btn-primary" id="setupCrop" onclick="step2();">Crop</button>
-                <button type="button" class="btn btn-primary" id="ttt" onclick="textExtract();">Trích thông tin</button>
-            </div>
-        </div>
-
-        <!-- <img id="image01" src="cv1.jpg" alt="cv1.jpg"> </img> -->		
         <button onclick="topFunction()" id="myBtn" title="Đi tới đầu"><i class="fa fa-chevron-up" aria-hidden="true"></i></button>
     </body>
 	<script src='https://cdn.rawgit.com/naptha/tesseract.js/1.0.10/dist/tesseract.js'></script>
@@ -214,37 +237,10 @@
         function topFunction() {
             $([document.documentElement, document.body]).animate({
                 scrollTop: 0
-            }, 500);
+            }, 400);
         }
     </script>
     <!-- \\scroll to the top -->
-
-    <script>
-        $(document).ready(function(){
-            // Add smooth scrolling to all links
-            $("a").on('click', function(event) {
-
-                // Make sure this.hash has a value before overriding default behavior
-                if (this.hash !== "") {
-                // Prevent default anchor click behavior
-                event.preventDefault();
-
-                // Store hash
-                var hash = this.hash;
-
-                // Using jQuery's animate() method to add smooth page scroll
-                // The optional number (800) specifies the number of milliseconds it takes to scroll to the specified area
-                $('html, body').animate({
-                    scrollTop: $(hash).offset().top
-                }, 800, function(){
-
-                    // Add hash (#) to URL when done scrolling (default click behavior)
-                    window.location.hash = hash;
-                });
-                } // End if
-            });
-        });
-    </script>
 
     <script>
         var typeExtraction = 0;
