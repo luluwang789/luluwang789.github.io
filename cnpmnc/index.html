@@ -262,8 +262,7 @@
         if (input.files && input.files[0]) {
             var reader = new FileReader();
             reader.onload = function (e) {
-                $("#crop-img").html("")
-                .append('<img src="' + e.target.result + '" alt="" id="image" width="400" height="500"/>');                
+                $("#crop-img").html("").append('<img src="' + e.target.result + '" alt="" id="image"/>');                
             
                 $("#crop-img  img").Jcrop({
                     onChange: canvas,
