@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR convert to CSV</title>
+
+    <!-- CSS CDN -->
+    <link rel="stylesheet" href="lib/css/bootstrap.min.css">
+    <script src="lib/js/bootstrap.min.js"></script>
+
+    <!-- FONT CDN -->
+    <!-- <script src="https://kit.fontawesome.com/d8de8a53b0.js" crossorigin="anonymous"></script> -->
+    <script src="lib/js/font-awesome.js" crossorigin="anonymous"></script>
+
+    <!-- CSS Edit -->
+    <style>
+    </style>
+</head>
+<body>
+    <br>
+    <div class="container">
+        <div class="card text-center">
+            <div class="card-header">
+                <h4 class="card-title">GROUP 7</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <table class="col-md-12">
+                        <tbody>
+                            <tr>
+                                <td style="width: 40%;">Trần Hoài Đức</td>
+                                <td style="width: 20%;">-</td>
+                                <td style="width: 40%;">44.01.104.076</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 40%;">Nguyễn Thành Duy</td>
+                                <td style="width: 20%;">-</td>
+                                <td style="width: 40%;">44.01.104.070</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 40%;">Nguyễn Thị Uyển Cương</td>
+                                <td style="width: 20%;">-</td>
+                                <td style="width: 40%;">44.01.104.058</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 40%;">Nguyễn Dương Hồng Điệu</td>
+                                <td style="width: 20%;">-</td>
+                                <td style="width: 40%;">44.01.104.004</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="card text-center">
+            <div class="card-header">
+                <h4 class="card-title">CONVERT IMAGE TEXT FILE TO CSV FILE</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-5">
+                        <input type="file" name="" class="form-control-file" id="" onchange="readURL(this);">
+                    </div>
+                    <div class="col-md-5 text-right">
+                        <a href="#" class="btn btn-outline-success btn-block" onclick="changeText();"><i class="fas fa-download"></i> CONVERT to CSV</a>
+                        <br>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-5">
+                        <img src="" alt="" id="img">
+
+                        <div style="display: none">
+                            <canvas id="canvas"></canvas>
+                            <input id="png" type="hidden" />
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <progress id="progressbar" class="progress-bar bg-success" min="0" max="1" value="0"/>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+
+    <!-- Javascript CDN -->
+    <script src="lib/js/jquery3.slim.min.js"></script>
+    <script src="lib/js/popper.min.js"></script>
+
+    <!-- Jcrop -->
+    <script src="lib/js/jquery.Jcrop.min.js"></script>
+
+    <!-- Tesseract -->
+    <script src="lib/js/tesseract.js"></script>
+
+    <!-- Javascript Code Edit -->
+    <script>
+        function readURL(input, part = 0) {
+            typeExtraction = part;
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#img')
+                        .attr('src', e.target.result)
+                        .width(400)
+                        .height(500);
+
+                    $('#img').Jcrop({
+                        onChange: canvas,
+                        onSelect: canvas,
+                        boxWidth: 400,
+                        boxHeight: 500,
+                    });
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function canvas(coords) {
+            var imageObj = $("#img")[0];
+            var canvas = $("#canvas")[0];
+            canvas.width = coords.w;
+            canvas.height = coords.h;
+            var context = canvas.getContext("2d");
+            context.drawImage(
+                imageObj,
+                coords.x,
+                coords.y,
+                coords.w,
+                coords.h,
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+            png();
+        }
+
+        function png() {
+            var png = $("#canvas")[0].toDataURL("image/png");
+            $("#png").val(png);
+        }
+
+        // convert image to text
+        function changeText() {
+            let image = $("#png").val();
+            if (image === "") image = $("#img").attr("src");
+            Tesseract.recognize(image, { lang: "vie" })
+                .progress(function (message) {
+                    document.getElementById("progressbar").value = message.progress;
+                    // console.log(message);
+                })
+                .then(function (result) {
+                    // console.log(result.lines);
+
+                    const arrs = new Array();
+
+                    for(var i=0; i<result.lines.length; i++){
+                        arrs[i] = result.lines[i].text;
+                    }
+
+                    exportToCsv('export.csv', arrs);
+
+                    $("#png").val("");
+                })
+                .catch(function (err) {
+                    console.error(err);
+                });
+        }
+
+        function exportToCsv(filename, rows) {
+            var processRow = function (row) {
+                var finalVal = '';
+                for (var j = 0; j < row.length; j++) {
+                    var innerValue = row[j] === null ? '' : row[j].toString();
+                    if (row[j] instanceof Date) {
+                        innerValue = row[j].toLocaleString();
+                    };
+                    var result = innerValue.replace(/"/g, '""');
+                    if (result.search(/("|,|\n)/g) >= 0)
+                        result = '"' + result + '"';
+                    if (j > 0)
+                        finalVal += ',';
+                    finalVal += result;
+                }
+                return finalVal + '\n';
+            };
+
+            var csvFile = '';
+            for (var i = 0; i < rows.length; i++) {
+                csvFile += processRow(rows[i]);
+            }
+
+            var blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
+            if (navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(blob, filename);
+            } else {
+                var link = document.createElement("a");
+                if (link.download !== undefined) { // feature detection
+                    // Browsers that support HTML5 download attribute
+                    var url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", filename);
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
